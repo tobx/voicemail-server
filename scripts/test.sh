@@ -49,13 +49,6 @@ if [ "${cleanup-}" = "true" ]; then
 fi
 
 
-# ---- Header Display ----
-
-if [ "${embed-}" != "true" ]; then
-    printf '%b\n\n' "${yellow}${project_name}${reset} test"
-fi
-
-
 # ---- Environment Validation ----
 
 if [ ! -e "$config_file" ]; then
