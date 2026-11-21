@@ -36,11 +36,11 @@ class Call(pj.Call):
     ):
         super().__init__(account, call_id)
         try:
-            caller = sip.extract_user_from_name_addr(self.getInfo().remoteUri)
+            raw_caller = sip.extract_user_from_name_addr(self.getInfo().remoteUri)
         except pj.Error:
             logger.exception("Could not parse incoming caller number")
-            caller = ""
-        self.entry = account.call_storage_service.log_call_start(caller)
+            raw_caller = ""
+        self.entry = account.call_storage_service.log_call_start(raw_caller)
         self.options = account.call_options
         self.player = None
         self.voicemail_recorder = None
@@ -134,7 +134,10 @@ class Call(pj.Call):
         try:
             info = self.getInfo()
             logger.info(
-                "Call %s (%s): %s", self.entry.id, self.entry.caller, info.stateText
+                "Call %s (%s): %s",
+                self.entry.id,
+                self.entry.format_caller(),
+                info.stateText,
             )
             if info.state == pj.PJSIP_INV_STATE_DISCONNECTED:
                 self.disconnected = True
@@ -188,7 +191,7 @@ class Call(pj.Call):
         )
         self.player.startTransmit(self.audio_media)
         self.state = "greeting"
-        logger.info("Playing greeting to %s", self.entry.caller)
+        logger.info("Playing greeting to %s", self.entry.format_caller())
 
     def _start_recording(self, now: float):
         self._stop_playback()
@@ -198,7 +201,7 @@ class Call(pj.Call):
             self.audio_media.startTransmit(self.voicemail_recorder)
         self.state = "recording"
         self.voicemail_deadline = now + self.options.voicemail_duration_max
-        logger.info("Recording message from %s", self.entry.caller)
+        logger.info("Recording message from %s", self.entry.format_caller())
 
     def _stop_playback(self):
         if self.player is not None:

@@ -32,7 +32,7 @@ class Account(pj.Account):
     def onIncomingCall(self, prm: pj.OnIncomingCallParam):
         call = Call(self, prm.callId)
         self.calls.add(call)
-        logger.info("Incoming call from %s", call.entry.caller)
+        logger.info("Incoming call from %s", call.entry.format_caller())
         response = pj.CallOpParam(True)
         response.statusCode = 503 if self.stopping else 200
         response.opt.audioCount = 1

@@ -11,9 +11,10 @@ include_sip_log_messages = false
 
 [call]
 data_directory = "" # leave empty if the server was installed
-data_retention = 30 # days
+data_retention_duration = 30 # days
 greeting_tone_gap = 0.5 # seconds
 media_timeout = 30 # seconds
+region_code = "US"
 voicemail_duration_max = 180 # seconds
 voicemail_duration_min = 0.5 # seconds
 voicemail_silence_threshold = -40 # dBFS (0 disables the silence threshold)
@@ -22,7 +23,6 @@ voicemail_silence_threshold = -40 # dBFS (0 disables the silence threshold)
 command = ["mail"]
 sender = "Voicemail Server <voicemail@example.com>"
 language = "english"
-phone_number_region_code = "US"
 time_zone = "UTC"
 timeout = 30 # seconds
 

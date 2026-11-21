@@ -1,4 +1,3 @@
-import phonenumbers
 import shutil
 
 from dataclasses import dataclass
@@ -30,7 +29,6 @@ class Mail(Section):
     sender: Mailbox
     recipients: list[Recipient]
     language: Language
-    phone_number_region_code: str
     time_zone: ZoneInfo
     timeout: int
 
@@ -106,10 +104,5 @@ class Mail(Section):
         if not self.command or any(not arg or "\0" in arg for arg in self.command):
             self.raiseAttributeValueError(
                 "command", "Value must be a list of nonempty strings"
-            )
-        if not self.phone_number_region_code in phonenumbers.SUPPORTED_REGIONS:
-            self.raiseAttributeValueError(
-                "region_code",
-                "'{self.region_code}' is not a valid region code",
             )
         self.validate_positive_number_attributes(["timeout"])

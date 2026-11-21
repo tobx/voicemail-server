@@ -11,7 +11,7 @@ license-files = ["LICENSE"]
 # possibly due to the PyMutex API introduced in Python 3.13 (observed on Debian).
 requires-python = ">=3.12,<3.13"
 
-dependencies = ["phonenumbers>=9.0.43", "pjsua2"]
+dependencies = ["phonenumbers>=9.0.43", "pjsua2", "vobject>=0.9.9"]
 
 [project.scripts]
 voicemail-server = "voicemail_server.__main__:main"

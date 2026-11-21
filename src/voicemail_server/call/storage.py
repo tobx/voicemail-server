@@ -1,5 +1,6 @@
 import logging
 import os
+import phonenumbers as pn
 import re
 import tempfile
 import threading
@@ -25,8 +26,14 @@ logger = logging.getLogger(__name__)
 class Entry:
     id: str
     start_time: datetime
-    caller: str
+    caller: pn.PhoneNumber | str
     voicemail_path: Path
+
+    def format_caller(self) -> str:
+        if isinstance(self.caller, pn.PhoneNumber):
+            return pn.format_number(self.caller, pn.PhoneNumberFormat.E164)
+        else:
+            return self.caller
 
 
 class Service:
@@ -41,18 +48,19 @@ class Service:
         self,
         data_dir: Path,
         retention_duration: timedelta,
+        region_code: str,
         min_voicemail_duration: float,
         voicemail_silence_threshold: float,
     ) -> None:
-        self._data_dir = data_dir.resolve()
-        self._voicemail_dir = self._data_dir / "voicemails"
-        self._log_path = self._data_dir / "calls.log"
+        self._data_dir = data_dir
+        self._voicemail_dir = data_dir / "voicemails"
+        self._log_path = data_dir / "calls.log"
         self._retention_duration = retention_duration
+        self._region_code = region_code
         self._min_voicemail_duration = min_voicemail_duration
         self._voicemail_silence_threshold = voicemail_silence_threshold
         self._lock = threading.RLock()
         self._protected: set[str] = set()
-        self._data_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
         self._voicemail_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
 
         # Create log file and verify log file permissions
@@ -72,10 +80,17 @@ class Service:
         with self._lock:
             self._protected.discard(entry.id)
 
-    def log_call_start(self, caller: str) -> Entry:
+    def log_call_start(self, raw_caller: str) -> Entry:
         start_time = utc()
-        caller = sanitize_single_line(caller) or "unknown"
-        safe_caller = re.sub(r"[^A-Za-z0-9+_.-]", "_", caller)[:80]
+        caller = sanitize_single_line(raw_caller) or "unknown"
+        try:
+            caller = pn.parse(caller, self._region_code)
+        except pn.NumberParseException:
+            pass
+        if isinstance(caller, pn.PhoneNumber):
+            safe_caller = pn.format_number(caller, pn.PhoneNumberFormat.E164)
+        else:
+            safe_caller = re.sub(r"[^A-Za-z0-9+_.-]", "_", caller)[:80]
         call_id = uuid4().hex
         timestamp = start_time.isoformat()
         voicemail_path = (
@@ -87,9 +102,7 @@ class Service:
             caller=caller,
             voicemail_path=voicemail_path,
         )
-        call_log_line = (
-            f"{start_time.isoformat(timespec='microseconds')}\t{caller}\t{call_id}\n"
-        )
+        call_log_line = f"{start_time.isoformat(timespec='microseconds')}\t{entry.format_caller()}\t{call_id}\n"
         # Protect call entry from retention
         with self._lock:
             self._protected.add(call_id)

@@ -29,6 +29,11 @@ def parse_args():
         metavar="FILE",
         help="use FILE (.wav) as greeting, or the default greeting if omitted",
     )
+    parser.add_argument(
+        "--contacts",
+        metavar="FILE",
+        help="replace contacts with contacts in FILE (.vcf)",
+    )
     return parser.parse_args(), parser.prog
 
 
@@ -75,6 +80,8 @@ def main() -> None:
             app = Application(app_name)
             if args.greeting is not None:
                 app.set_greeting(config, Path(args.greeting) if args.greeting else None)
+            elif args.contacts is not None:
+                app.set_contacts_vcard(config, Path(args.contacts))
             else:
                 app.run(config, stop_event)
         finally:

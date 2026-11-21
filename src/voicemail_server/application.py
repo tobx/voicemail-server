@@ -13,7 +13,7 @@ from importlib.resources import as_file, files
 from pathlib import Path
 from wave import Wave_read
 
-from . import call
+from . import call, contacts
 from .call import storage
 from .configuration import Configuration
 from .mail import gnu
@@ -32,22 +32,23 @@ class Application:
         if not config.call.greeting_file.exists():
             self.set_greeting(config)
         greeting_duration = config.preflight()
-        data_dir = Path(config.call.data_directory)
+        data_dir = Path(config.call.data_directory).resolve()
+        data_dir.mkdir(mode=0o700, parents=True, exist_ok=True)
         with lock_data_dir(data_dir):
             call_storage_service = storage.Service(
                 data_dir,
-                timedelta(days=config.call.data_retention),
+                timedelta(days=config.call.data_retention_duration),
+                config.call.region_code,
                 config.call.voicemail_duration_min,
                 config.call.voicemail_silence_threshold,
             )
-            mailer = gnu.Mailer(config.mail.command, config.mail.timeout)
             notifier = MailNotifier(
-                mailer,
+                gnu.Mailer(config.mail.command, config.mail.timeout),
                 config.mail.sender,
                 config.mail.recipients,
-                config.mail.phone_number_region_code,
                 config.mail.language,
                 config.mail.time_zone,
+                contacts.Service(data_dir, config.call.region_code),
             )
             with ThreadPoolExecutor(
                 max_workers=2, thread_name_prefix=self.name
@@ -147,6 +148,11 @@ class Application:
                                     account = None
                     finally:
                         endpoint.libDestroy()
+
+    def set_contacts_vcard(self, config: Configuration, path: Path) -> None:
+        data_dir = Path(config.call.data_directory).resolve()
+        service = contacts.Service(data_dir, config.call.region_code)
+        service.replace_contacts_with_vcard(path)
 
     def set_greeting(self, config: Configuration, path: Path | None = None) -> None:
         tone_gap = config.call.greeting_tone_gap

@@ -1,26 +1,20 @@
+import phonenumbers
 import wave
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import (
-    Any,
-    Self,
-    TypedDict,
-)
+from typing import Any, Self
 
 from .section import Section
-
-
-class Options(TypedDict):
-    default_data_directory: str
 
 
 @dataclass
 class Call(Section):
     data_directory: str
-    data_retention: int
+    data_retention_duration: int
     greeting_tone_gap: float
     media_timeout: int
+    region_code: str
     voicemail_duration_max: int
     voicemail_duration_min: float
     voicemail_silence_threshold: float
@@ -64,8 +58,13 @@ class Call(Section):
     def validate(self) -> None:
         self.validate_string_attributes(["data_directory"], ["nonempty", "single-line"])
         self.validate_positive_number_attributes(
-            ["data_retention", "media_timeout", "voicemail_duration_max"]
+            ["data_retention_duration", "media_timeout", "voicemail_duration_max"]
         )
+        if not self.region_code in phonenumbers.SUPPORTED_REGIONS:
+            self.raiseAttributeValueError(
+                "region_code",
+                "'{self.region_code}' is not a valid region code",
+            )
         if (
             self.voicemail_duration_min < 0
             or self.voicemail_duration_min >= self.voicemail_duration_max
