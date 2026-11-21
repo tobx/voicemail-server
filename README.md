@@ -18,6 +18,24 @@ The SIP account and password can also be provided through the `VOICEMAIL_SERVER_
 
 A configuration file must be specified using the `--config` option when [starting the server](#start-the-server) unless the server was [installed](#installation).
 
+### Greeting message
+
+Specify a custom greeting message:
+
+```bash
+uv run -- voicemail-server --greeting "path/to/greeting.wav"
+```
+
+**Note:** The file will be imported into the application's data directory.
+
+### Contacts
+
+Import a [vCard](https://www.rfc-editor.org/info/rfc6350/) file to display contact names in notifications:
+
+```bash
+uv run -- voicemail-server --contacts "path/to/contacts.vcf"
+```
+
 
 ## Start the server
 
@@ -30,13 +48,19 @@ uv run -- voicemail-server --config "path/to/config.toml"
 
 ## Installation
 
-Before the installation run `scripts/install.sh --help` to see the available installation options.
+Before the installation, run `scripts/install.sh --help` to see the available installation options.
 
 **Note:** Run `scripts/install.sh --info` to display the paths and configurations that will be affected by the installation.
 
 Install the server with `scripts/install.sh`.
 
 After the installation [configure](#configuration) the server. To find the path to the config file, run `scripts/install.sh --info`.
+
+On Debian-like systems, the voicemail server can be run as a service with:
+
+```bash
+systemctl enable --now voicemail-server.service
+```
 
 
 ## Uninstallation
@@ -50,11 +74,11 @@ Run a test server:
 
 1. Run the [setup](#setup) script.
 
-2. Run `test/run.sh` to create config file `test/config.toml`.
+2. Run `test/run.sh` to create the config file `test/config.toml`.
 
 3. Adjust the config file settings.
 
-4. Run `test/run.sh`
+4. Run `test/run.sh`.
 
 
 ## PJSIP
@@ -68,4 +92,4 @@ The available log levels can be found [here](https://docs.pjsip.org/en/latest/sp
 
 ### Firewall
 
-You might need to open port 4000 and 4001 for incoming UDP traffic.
+Firewall ports 4000 and 4001 might need to be opened for incoming UDP traffic.
