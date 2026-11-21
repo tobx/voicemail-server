@@ -1,0 +1,33 @@
+[project]
+name = "voicemail-server"
+version = "0.1.0"
+description = "VoIP voicemail server"
+authors = [{ name = "Tobias Strobel", email = "code@tobx.de" }]
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+
+# PJSUA2 2.17 SWIG bindings cause a PyMutex_Unlock fatal error with Python >= 3.13,
+# possibly due to the PyMutex API introduced in Python 3.13 (observed on Debian).
+requires-python = ">=3.12,<3.13"
+
+dependencies = ["phonenumbers>=9.0.43", "pjsua2"]
+
+[project.scripts]
+voicemail-server = "voicemail_server.__main__:main"
+
+[project.urls]
+Homepage = "https://github.com/tobx/voicemail-server"
+Documentation = "https://github.com/tobx/voicemail-server#readme"
+Repository = "https://github.com/tobx/voicemail-server"
+Issues = "https://github.com/tobx/voicemail-server/issues"
+
+[build-system]
+requires = ["uv_build>=0.13.5,<0.14.0"]
+build-backend = "uv_build"
+
+[tool.pyright]
+exclude = ["vendor/"]
+ignore = [".venv"]
+pythonPlatform = "All"
+typeCheckingMode = "strict"

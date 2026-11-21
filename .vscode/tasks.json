@@ -1,0 +1,21 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "run",
+      "detail": "scripts/test.sh --debug",
+      "type": "shell",
+      "command": "scripts/test.sh",
+      "args": ["--debug"],
+      "problemMatcher": []
+    },
+    {
+      "label": "Clean up test dir",
+      "detail": "scripts/test.sh --cleanup",
+      "type": "shell",
+      "command": "scripts/test.sh",
+      "args": ["--cleanup"],
+      "problemMatcher": []
+    }
+  ]
+}

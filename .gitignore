@@ -1,0 +1,19 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv/
+
+# Project configuration (keep platform-dependent settings out of the Git repository)
+/pyproject.toml
+
+# uv
+/uv.lock
+
+# Vendor dependencies
+/vendor/

@@ -1,0 +1,24 @@
+{
+  "editor.formatOnSave": true,
+  "editor.insertSpaces": true,
+  "evenBetterToml.formatter.alignComments": false,
+  "explorer.compactFolders": true,
+  "files.exclude": {
+    "**/.venv/**": true,
+    "dist/": true,
+    "uv.lock": true,
+    "vendor/": true,
+    "wheels/": true
+  },
+  "git.repositoryScanMaxDepth": 0,
+  "markdown.extension.toc.levels": "2..3",
+  "python.analysis.diagnosticMode": "workspace",
+  "python.analysis.languageServerMode": "full",
+  "python.terminal.activateEnvironment": false,
+  "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  }
+}

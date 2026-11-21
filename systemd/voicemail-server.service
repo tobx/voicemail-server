@@ -1,0 +1,19 @@
+[Unit]
+Description=Voicemail Server
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/usr/local/bin/voicemail-server
+WorkingDirectory=/var/local/lib/voicemail-server
+User=voicemail
+Group=voicemail
+UMask=0007
+
+Restart=always
+RestartSec=1s
+RestartSteps=6
+RestartMaxDelaySec=64s
+
+[Install]
+WantedBy=multi-user.target
