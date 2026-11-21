@@ -40,13 +40,13 @@ class MailNotifier:
         voicemail_path: Path | None,
         note: str = "",
     ) -> None:
-        subject = self.template["subject"].format(caller=entry.caller)
-        start_time = entry.start_time.astimezone(self.time_zone)
         caller = entry.caller
         if (
             number := phonenumber.format(caller, self.phone_number_region_code)
         ) is not None:
             caller = number
+        subject = self.template["subject"].format(caller=caller)
+        start_time = entry.start_time.astimezone(self.time_zone)
         for recipient in self.recipients:
             body = [
                 self.template["greeting"].format(recipient=recipient.preferred_name),
